@@ -8,6 +8,7 @@ var options = {
   src: 'src',
   dist: 'dist',
   tmp: '.tmp',
+  portal : 'portal',
   e2e: 'e2e',
   errorHandler: function(title) {
     return function(err) {

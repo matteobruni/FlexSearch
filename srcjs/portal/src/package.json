@@ -1,0 +1,7 @@
+{
+  "name"    : "flexsearch-portal",
+  "version" : "0.1.0",
+  "main"    : "main.js",
+  "hostname": "localhost",
+  "port"    : 9800
+}

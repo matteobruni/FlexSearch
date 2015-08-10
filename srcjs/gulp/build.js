@@ -102,6 +102,29 @@ module.exports = function(options) {
       .pipe(gulp.dest(options.tmp))
       .pipe(gulp.dest(options.dist))
   });
+  
+  gulp.task('portal', function() {
+    var packager = require('electron-packager');
+    $.util.log("Building Electron portal...");
+    
+    return packager({
+      dir : options.portal + "/src",
+      name : "FlexPortal",
+      platform : "win32",
+      arch : "all",
+      version : "0.30.3",
+      out : options.portal + "/release",
+      overwrite : true
+    }, function done (err, appPath) {
+      $.util.log("Error: " + JSON.stringify(err) + "\nApp Path: " + appPath); 
+      if (appPath != null) {
+        $.util.log("Compressing...");
+        gulp.src(options.portal + "/release/FlexPortal-*/**")
+        .pipe($.zip('portal.zip'))
+        .pipe(gulp.dest(options.portal + '/release'));
+      }
+    });
+  });
 
   gulp.task('build', ['html', 'fonts', 'other', 'pure-libs', 'swagger']);
 };
