@@ -148,6 +148,21 @@ Target "GenerateSwagger" <| fun _ ->
 
     FileUtils.cd @"..\src"
 
+// Electron related
+Target "BuildElectron" <| fun _ ->
+    FileUtils.cd portalDir
+    PowerShell.Create()
+        .AddScript("Invoke-Expression \"gulp portal\"")
+        .Invoke()
+        |> Seq.iter (sprintf "%A" >> trace)
+
+    FileUtils.cd @"..\src"
+
+Target "MoveElectron" <| fun _ ->
+    trace "Moving Electron portal"
+    let source = portalDir + @"\portal\release\portal.zip"
+    source |> FileHelper.CopyFile webDir 
+
 // Dependencies
 "Clean" 
 ==> "RestorePackages" 
@@ -158,7 +173,11 @@ Target "GenerateSwagger" <| fun _ ->
 ==> "MoveFiles" 
 ==> "GenerateSwagger"
 ==> "MovePortal"
+==> "MoveElectron"
 ==> "Zip"
+
+"BuildElectron"
+==> "MoveElectron"
 
 "BuildPortal"
 ==> "MovePortal"
