@@ -312,3 +312,13 @@ type GetMemoryDetails =
     new : unit -> GetMemoryDetails
     override Process : request:Http.RequestContext * body:NoBody option ->
                 Http.ResponseContext<MemoryDetailsResponse>
+
+# ws_GetPortalHandler """
+Returns the Electron portal
+"""
+[<NameAttribute ("GET-/downloadportal"); SealedAttribute ()>]
+type GetPortalHandler =
+    inherit Http.HttpHandlerBase<NoBody,unit>
+    new : unit -> unit
+    override Process : request:Http.RequestContext * body:NoBody option ->
+                Http.ResponseContext<unit>

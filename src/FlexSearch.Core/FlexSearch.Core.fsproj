@@ -157,6 +157,10 @@
       <HintPath>..\packages\FSharpx.Extras.1.10.2\lib\40\FSharpx.Extras.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="IKVM.AWT.WinForms">
       <HintPath>..\packages\IKVM.8.0.5449.1\lib\IKVM.AWT.WinForms.dll</HintPath>
       <Private>True</Private>

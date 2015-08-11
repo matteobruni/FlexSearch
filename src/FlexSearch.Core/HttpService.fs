@@ -20,6 +20,10 @@ namespace FlexSearch.Core
 open Microsoft.Owin
 open System.Net
 open System.IO
+open ICSharpCode.SharpZipLib.Core
+open ICSharpCode.SharpZipLib.Zip
+open Newtonsoft.Json.Linq
+open Helpers
 
 /// Returns OK status
 [<Sealed>]
@@ -44,7 +48,7 @@ type GetRootHandler() =
         else
             FailureResponse(FileNotFound(filePath), NotFound)
 
-/// Returns the homepage
+/// Returns the favicon
 [<Name("GET-/favicon.ico")>]
 [<Sealed>]
 type GetFaviconHandler() = 
@@ -470,3 +474,42 @@ type GetMemoryDetails() =
             UsedMemory = usedMemory,
             TotalMemory = totalMemory,
             Usage = float(usedMemory) / float(totalMemory) * 100.0), Ok)
+
+/// Serves the electron portal
+[<Name("GET-/downloadportal")>]
+[<Sealed>]
+type GetPortalHandler() = 
+    inherit HttpHandlerBase<NoBody, unit>()
+    
+    let filePath = Constants.WebFolder +/ "portal.zip"
+    let unzip fileName = 
+        let target = Constants.WebFolder +/ "portal"
+        if Directory.Exists target |> not then
+            let fastZip = new FastZip()
+            fastZip.ExtractZip(fileName, Constants.WebFolder +/ "portal", null)
+    let updateJson (request : IOwinRequest) jsonPath =
+        let host = request.Host.Value.Split(':').[0]
+        let port = request.Host.Value.Split(':').[1]
+        let token = JObject.Parse (File.ReadAllText jsonPath)
+        token.Property("hostname").Value <- JValue(host)
+        token.Property("port").Value <- JValue(port)
+        File.WriteAllText(jsonPath, token.ToString())
+    let zip folder = 
+        (folder + ".zip") |> File.Delete
+        let fastZip = new FastZip();
+        fastZip.CreateZip(folder + ".zip", folder, true, null)
+
+    override __.Process(request, _) = 
+        if filePath |> System.IO.File.Exists then
+            // Change the config in the portal to use hostname and port from request
+            unzip filePath
+            Directory.EnumerateFiles(Constants.WebFolder +/ "portal", @"package.json", SearchOption.AllDirectories)
+            |> Seq.filter (fun x -> x.Contains("default_app") |> not)
+            |> Seq.iter (updateJson request.OwinContext.Request)
+            zip <| Constants.WebFolder +/ "portal"
+
+            // Return the modified zip file
+            request.OwinContext.Response.Redirect("/portal/portal.zip");
+            NoResponse
+        else
+            FailureResponse(FileNotFound(filePath), NotFound)
