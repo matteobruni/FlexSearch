@@ -319,6 +319,6 @@ Returns the Electron portal
 [<NameAttribute ("GET-/downloadportal"); SealedAttribute ()>]
 type GetPortalHandler =
     inherit Http.HttpHandlerBase<NoBody,unit>
-    new : unit -> unit
+    new : unit -> GetPortalHandler
     override Process : request:Http.RequestContext * body:NoBody option ->
                 Http.ResponseContext<unit>
